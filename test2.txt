@@ -9,10 +9,3 @@ An octopus uses a part of its body called a siphon
 to shoot ink into the water. The ink forms a cloud that hides the octopus. By the time the ink
 clears and the predator can see again, the octopus has swum away. It’s very much
 like a magician doing a vanishing act.
-3 intelligent
-1 learn things
-1 learn tricks
-1 hide octopus
-1 stay water
-1 use siphon
-2 hide ink
