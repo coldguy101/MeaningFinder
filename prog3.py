@@ -1,6 +1,9 @@
 from nltk.stem.snowball import SnowballStemmer
 from nltk import word_tokenize
 from nltk import tree
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.corpus import wordnet
+
 import nltk
 import sys
 import codecs
@@ -20,6 +23,51 @@ def prepare_text( text ):
     text_copy = nltk.pos_tag(text_copy)
 
     return text_copy
+
+def process( sub, subtree ) :
+    lemmatizer = WordNetLemmatizer()
+    label = subtree.label();
+    sub = lemmatizer.lemmatize(sub.lower(), wordnet.NOUN)
+    #print sub
+    if label == 'TY31':
+        #Checks if the chunk is important
+        np = subtree[0].leaves()
+
+        for word in np:
+            if word[1].startswith('NN'):
+                if  lemmatizer.lemmatize(word[0].lower(), get_wordnet_pos( word[1] )) == sub:
+                    part = subtree[2]
+                    part = part.leaves()
+                    for adj in part:
+                        if adj[1].startswith('J'):
+                            print '3 ' + lemmatizer.lemmatize(adj[0], get_wordnet_pos( adj[1] ) )
+                    break
+    elif label == 'TY32':
+        #Checks if the chunk is important
+        np = subtree[1].leaves()
+
+        for word in np:
+            if word[1].startswith('NN'):
+                if  lemmatizer.lemmatize(word[0].lower(), get_wordnet_pos( word[1] )) == sub:
+                    part = subtree[0]
+                    part = part.leaves()
+                    for adj in part:
+                        if adj[1].startswith('J'):
+                            print '3 ' + lemmatizer.lemmatize(adj[0], get_wordnet_pos( adj[1] ) )
+                    break
+
+def get_wordnet_pos( tag ):
+    if tag.startswith('J') :
+        return wordnet.ADJ
+    elif tag.startswith('V'):
+        return wordnet.VERB
+    elif tag.startswith('N'):
+        return wordnet.NOUN
+    elif tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return ''
+
 
 #(name, text) = read_file(raw_input('What is the name for the file to read\n'))
 
@@ -53,30 +101,34 @@ for word in text_proc:
     counter += 1
 
 #//actual prog
-print text_proc
-for word in text_proc:
-    print word[0] ,
 
 grammar = r"""
-        VP: {<RB.*>*<VB.*>+<RB.*>*}
-        JJP: {<JJ.*>+}
+        VP: {<W.*>*<RB.*>*<VB.*>+<RB.*>*}
+        JJP: {<JJ.*|CC>+}
         NP:  {<DT>?<JJP>*<PRP.*>*<NN.*>}
-        TY3: {<NP><VP><JJP>}
-        TY1: {<NP><NP><VP>}
-        TY1: {<NP><VP><NP>}
-        TY1: {<NP><VP><IN><NP>}
-        TY1: {<NP><VP>}
-        TY3: {<JJP><NP>}
-
-        """
+        TY31: {<NP><VP><JJP>}
+        TY11: {<NP><NP><VP>}
+        TY12: {<NP><VP><NP>}
+        TY13: {<NP><VP><IN><NP>}
+        TY14: {<TY1.*><VP><NP>}
+        TY15: {<NP><VP>}
+        TY32: {<JJP><NP>}
+       """
 cp = nltk.RegexpParser(grammar)
 
 result = cp.parse(text_proc)
 
 for subtree in result.subtrees():
-    print subtree
-    #if subtree.label() == 'TY1' or subtree.label() == 'TY3':
-    #    print subtree
+    if subtree.label() != 'VP' and subtree.label() != 'NP' and subtree.label() != 'JJP' and subtree.label() != 'S':
+        process(name, subtree)
+        #print subtree
+
+"""
+print text_proc
+for word in text_proc:
+    print word[0] ,
+"""
+
 
 """
 for sent in brown.tagged_sents():
