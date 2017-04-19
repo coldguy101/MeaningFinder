@@ -58,14 +58,15 @@ for word in text_proc:
     print word[0] ,
 
 grammar = r"""
-        NP:  {<DT>?<JJ>*<NN.*>}
-        VP: {<VB.*>+}
-        JJP: {<JJ>+}
-        TY1: {<NP><VP><NP>}
+        VP: {<RB.*>*<VB.*>+<RB.*>*}
+        JJP: {<JJ.*>+}
+        NP:  {<DT>?<JJP>*<PRP.*>*<NN.*>}
+        TY3: {<NP><VP><JJP>}
         TY1: {<NP><NP><VP>}
+        TY1: {<NP><VP><NP>}
+        TY1: {<NP><VP><IN><NP>}
         TY1: {<NP><VP>}
         TY3: {<JJP><NP>}
-        TY3: {<NP><VP><JJP>}
 
         """
 cp = nltk.RegexpParser(grammar)
@@ -73,8 +74,9 @@ cp = nltk.RegexpParser(grammar)
 result = cp.parse(text_proc)
 
 for subtree in result.subtrees():
-    if subtree.label() == 'TY1' or subtree.label() == 'TY3':
-        print subtree
+    print subtree
+    #if subtree.label() == 'TY1' or subtree.label() == 'TY3':
+    #    print subtree
 
 """
 for sent in brown.tagged_sents():
