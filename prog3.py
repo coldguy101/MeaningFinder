@@ -1,3 +1,9 @@
+"""
+Program 3 Natural Language Processing
+Santiago Andaluz And Sean Lavoie
+April 19
+"""
+
 from nltk.stem.snowball import SnowballStemmer
 from nltk import word_tokenize
 from nltk import tree
